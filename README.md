@@ -157,6 +157,43 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
+### grpcx
+
+gRPC server helpers: server builder, zerolog interceptors, OTEL instrumentation, and health/reflection helpers.
+
+```go
+import (
+  "net"
+
+  "github.com/nikolapavicevic-001/CommonGo/grpcx"
+  "github.com/nikolapavicevic-001/CommonGo/logger"
+)
+
+log := logger.New("info", "device-service")
+
+srv, err := grpcx.NewServer(grpcx.Options{
+  Logger:           log,
+  EnableHealth:     true,
+  EnableReflection: true,
+  EnableOTel:       true,
+})
+if err != nil {
+  log.Fatal().Err(err).Msg("failed to create grpc server")
+}
+
+lis, err := net.Listen("tcp", ":9090")
+if err != nil {
+  log.Fatal().Err(err).Msg("failed to listen")
+}
+
+// Register your service(s)...
+// pb.RegisterMyServiceServer(srv, handler)
+
+if err := srv.Serve(lis); err != nil {
+  log.Fatal().Err(err).Msg("grpc serve failed")
+}
+```
+
 ## Environment Variables
 
 | Variable | Description | Default |
